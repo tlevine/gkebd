@@ -6,7 +6,9 @@ import requests
 
 from . import parse
 
-get = cache('~/.gkebd', cache_exceptions = True)(requests.get)
+@cache('~/.gkebd', cache_exceptions = True)
+def get(url, *args, **kwargs):
+    return requests.get(url, *args, headers = { 'user-agent': 'https://pypi.python.org/pypi/gkebd'})
 
 def gkebd():
     url = 'https://sv.wikipedia.org/wiki/Lista_%C3%B6ver_Sveriges_kommuner'
