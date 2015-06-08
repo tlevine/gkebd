@@ -1,1 +1,8 @@
 Tracking trackers
+----------------------
+
+List the third-party scripts on Swedish municipality websites.
+::
+
+    pip3 install gkebd
+    gkebd > thirdparty.csv
