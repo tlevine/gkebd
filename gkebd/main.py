@@ -8,7 +8,7 @@ get = cache('~/.gkebd')(requests.get)
 def gkebd():
     url = 'https://sv.wikipedia.org/wiki/Lista_%C3%B6ver_Sveriges_kommuner'
     for kommun in parse.kommuner(get(url)):
-        yield check(get(parse.hemsida(kommun)))
+        yield parse.tracking(get(parse.hemsida(kommun)))
 
 def cli():
     import csv, sys

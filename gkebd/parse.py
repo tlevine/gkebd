@@ -16,3 +16,6 @@ def hemsida(kommun):
 def kommuner(response):
     html = fromstring(response)
     return filter(lambda href: href.endswith(' kommun'), html.xpath('//a/@href'))
+
+def tracking(response):
+    pass
