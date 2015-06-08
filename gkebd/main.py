@@ -21,6 +21,8 @@ def gkebd_one(kommun):
             r = get(url, timeout = 10)
         except requests.exceptions.ConnectionError:
             pass
+        except requests.exceptions.ReadTimeout:
+            pass
         else:
             return kommun, parse.tracking(r)
     else:
