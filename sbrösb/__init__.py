@@ -5,7 +5,7 @@ from .check import check
 
 get = cache('~/.sbrösb')(requests.get)
 
-def main():
+def sbrör():
     url = 'https://sv.wikipedia.org/wiki/Lista_%C3%B6ver_Sveriges_kommuner'
     for kommun in parse.kommuner(get(url)):
         yield check(get(parse.hemsida(kommun)))
