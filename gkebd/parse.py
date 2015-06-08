@@ -27,8 +27,12 @@ def kommuner(response):
 def tracking(response):
     html = fromstring(response.content)
     html.make_links_absolute(response.url)
+
+    o = urlparse(response.url)
+    first_party = (o.scheme, o.netloc)
+
     for src in html.xpath('//script/@src'):
         p = urlparse(src)
-        url = '%s://%s' % (p.scheme, p.netloc)
-        if url != response.url.strip('/'):
-            yield url
+        third_party = (p.scheme, p.netloc)
+        if third_party != first_party:
+            yield '%s://%s' % third_party
