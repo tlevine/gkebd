@@ -7,7 +7,7 @@ setup(name='gkebd',
       url='https://dada.pink/gkebd/',
       packages=['gkebd'],
       install_requires = [],
-      version='0.0.1',
+      version='0.0.2',
       license='AGPL',
       entry_points = {'console_scripts': ['gkebd = gkebd.main:cli']},
 )
