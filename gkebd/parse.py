@@ -12,7 +12,8 @@ def hemsida(kommun):
     m = re.match(r'^(.+[^s])(s?) kommun$', kommun)
     if not m:
         assert False, kommun
-    x = unidecode(m.group(1).lower())
+    w = unidecode(m.group(1).lower())
+    x = re.sub(r'[ -]', '', w)
     for scheme in ['http', 'https']:
         for prefix in ['', 'www.']:
             yield '%s://%s%s.se' % (scheme, prefix, x)
