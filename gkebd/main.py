@@ -1,7 +1,7 @@
 import os, sys
 import subprocess, json, tempfile
 from collections import OrderedDict
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from vlermv import cache
 import requests
@@ -10,7 +10,8 @@ from . import parse
 
 @cache('~/.gkebd', cache_exceptions = True)
 def get(url, *args, **kwargs):
-    return requests.get(url, *args, headers = { 'user-agent': 'https://pypi.python.org/pypi/gkebd'})
+    return requests.get(url, *args, follow_redirects = False,
+        headers = { 'user-agent': 'https://pypi.python.org/pypi/gkebd'})
 
 @cache('~/.gkebd-cookies', serializer = json)
 def check_cookies(url):
@@ -23,9 +24,9 @@ def check_cookies(url):
 def startsidor():
     url = 'https://sv.wikipedia.org/wiki/Lista_%C3%B6ver_Sveriges_kommuner'
     with ThreadPoolExecutor(20) as e:
-        for startsida, response in e.map(hitta_startsida, parse.kommuner(get(url))):
-            if response != None:
-                yield startsida, response
+        futures = (e.submit(hitta_startsida, k) for k in parse.kommuner(get(url)))
+        for future in as_completed(futures):
+            yield future.result()
 
 def hitta_startsida(kommun):
     for url in parse.gissa_startsida(kommun):
@@ -46,7 +47,7 @@ def hitta_startsida(kommun):
 def cli():
     import dataset
 
-    fn = 'gkebd.sqlite'
+    fn = '/tmp/gkebd.sqlite'
     if os.path.exists(fn):
         os.remove(fn)
     db = dataset.connect('sqlite:///' + fn)
@@ -66,9 +67,11 @@ CREATE TABLE kaka (
   UNIQUE(kommun, name)
 )''')
 
-    with ThreadPoolExecutor(20) as e:
-        for kommun, startsida in startsidor():
-            future = e.submit(gkebd, db, kommun, startsida)
+#   with ThreadPoolExecutor(8) as e:
+#       for kommun, startsida in startsidor():
+#           e.submit(gkebd, db, kommun, startsida)
+    for kommun, startsida in startsidor():
+        gkebd(db, kommun, startsida)
 
 def gkebd(db, kommun, startsida):
     db['startsida'].insert({'kommun': kommun, 'startsida': startsida})

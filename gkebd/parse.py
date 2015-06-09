@@ -4,17 +4,23 @@ from urllib.parse import urlparse
 from lxml.html import fromstring
 from unidecode import unidecode
 
+MANUAL = {
+    'Falu kommun': 'http://www.falun.se',
+}
 def gissa_startsida(kommun):
-    m = re.match(r'^(.+[^s])(s?) kommun$', kommun)
-    if not m:
-        assert False, kommun
-    w = unidecode(m.group(1).lower())
-    x = re.sub(r'[ -]', '', w)
-    for scheme in ['http', 'https']:
-        for prefix in ['', 'www.']:
-            yield '%s://%s%s.se' % (scheme, prefix, x)
-            if m.group(2) == 's':
-                yield '%s://%s%ss.se' % (scheme, prefix, x)
+    if kommun in MANUAL:
+        yield MANUAL[kommun]
+    else:
+        m = re.match(r'^(.+[^s])(s?) kommun$', kommun)
+        if not m:
+            assert False, kommun
+        w = unidecode(m.group(1).lower())
+        x = re.sub(r'[ -]', '', w)
+        for scheme in ['http', 'https']:
+            for prefix in ['', 'www.']:
+                yield '%s://%s%s.se' % (scheme, prefix, x)
+                if m.group(2) == 's':
+                    yield '%s://%s%ss.se' % (scheme, prefix, x)
 
 def kommuner(response):
     html = fromstring(response.content)
@@ -28,8 +34,8 @@ def tracking(response):
     first_party = (o.scheme, o.netloc)
 
     for src in html.xpath('//script/@src'):
-        yield startsida(url)
+        yield startsida(src)
 
 def startsida(url):
-    p = urlparse(src)
+    p = urlparse(url)
     return '%s://%s' % (p.scheme, p.netloc)
