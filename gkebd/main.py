@@ -24,9 +24,12 @@ def check_cookies(url):
 def startsidor():
     url = 'https://sv.wikipedia.org/wiki/Lista_%C3%B6ver_Sveriges_kommuner'
     with ThreadPoolExecutor(20) as e:
-        futures = (e.submit(hitta_startsida, k) for k in parse.kommuner(get(url)))
+        futures = {e.submit(hitta_startsida, k): url for k in parse.kommuner(get(url))}
         for future in as_completed(futures):
-            yield future.result()
+            if future.exception():
+                sys.stderr.write('Exception at %s' % futures[future])
+            else:
+                yield future.result()
 
 def hitta_startsida(kommun):
     for url in parse.gissa_startsida(kommun):
