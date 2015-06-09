@@ -12,9 +12,13 @@ if (system.args.length != 3) {
 var filename = system.args[1]
   , url = system.args[2]
 
-function f(status) {
-  fs.write(filename, JSON.stringify(phantom.cookies) + '\n')
-  phantom.exit()
-}
+page.open(url)
 
-page.open(url, f)
+// https://groups.google.com/d/msg/phantomjs/dEI28sMwGEU/Z8bQXS-fPOUJ
+setTimeout(function() {
+  setTimeout(function() {          
+    fs.write(filename, JSON.stringify(phantom.cookies) + '\n')
+    page.render(filename.replace('.json', '') + '.png')
+    phantom.exit()
+  }, 5000)
+}, 1)
