@@ -1,11 +1,13 @@
 #!/usr/bin/env phantomjs
-#
-# USAGE: check-cookies.js [output JSON file] [url]
-#
 
 var page = require('webpage').create()
   , system = require('system')
   , fs = require('fs')
+
+if (system.args.length != 3) {
+  console.log('USAGE: check-cookies.js [output JSON file] [url]')
+  phantom.exit(1)
+}
 
 var filename = system.args[1]
   , url = system.args[2]
