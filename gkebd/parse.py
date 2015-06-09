@@ -5,7 +5,7 @@ from lxml.html import fromstring
 from unidecode import unidecode
 
 MANUAL = {
-    'Dals-Eds kommun': 'http://dalsed.se',
+    'Dals-Eds kommun': 'http://www.dalsed.se',
     'Falu kommun': 'http://www.falun.se',
     'Hällefors kommun': None,
 }
