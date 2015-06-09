@@ -36,8 +36,7 @@ def tracking(response):
     o = urlparse(response.url)
     first_party = (o.scheme, o.netloc)
 
-    for src in html.xpath('//script/@src'):
-        yield startsida(src)
+    return html.xpath('//script/@src')
 
 def startsida(url):
     p = urlparse(url)

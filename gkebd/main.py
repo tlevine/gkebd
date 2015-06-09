@@ -66,6 +66,12 @@ def cli():
 
     db.engine.execute('CREATE TABLE startsida (kommun TEXT, UNIQUE(kommun))')
     db.engine.execute('''
+CREATE TABLE skript (
+  kommun TEXT, 
+
+  FOREIGN KEY (kommun) REFERENCES startsida(kommun)
+)''')
+    db.engine.execute('''
 CREATE TABLE kaka (
   kommun TEXT NOT NULL,
   name TEXT NOT NULL,
@@ -75,7 +81,9 @@ CREATE TABLE kaka (
   httponly INTEGER,
   secure INTEGER,
   expires TEXT,
-  expiry TEXT
+  expiry TEXT,
+
+  FOREIGN KEY (kommun) REFERENCES startsida(kommun)
 )''')
 
     for kommun, startsida in startsidor():
@@ -99,8 +107,12 @@ CREATE TABLE kaka (
 def gkebd(db, kommun, startsida):
     db['startsida'].insert({'kommun': kommun, 'startsida': startsida})
 
-    for thirdparty in parse.tracking(get(startsida)):
-        db['skript'].insert({'kommun': kommun, 'thirdparty': thirdparty})
+    for url in parse.tracking(get(startsida)):
+        db['skript'].insert({
+            'kommun': kommun,
+            'url': url,
+        #   'domain': parse.startsida(url),
+        })
 
     kakor = check_cookies(startsida)
     for kaka in kakor:
