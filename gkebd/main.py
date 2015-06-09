@@ -10,8 +10,8 @@ from . import parse
 
 @cache('~/.gkebd', cache_exceptions = True)
 def get(url, *args, **kwargs):
-    return requests.get(url, *args, follow_redirects = False,
-        headers = { 'user-agent': 'https://pypi.python.org/pypi/gkebd'})
+    return requests.get(url, *args, allow_redirects = False,
+        headers = {'user-agent': 'https://pypi.python.org/pypi/gkebd'})
 
 @cache('~/.gkebd-cookies', serializer = json)
 def check_cookies(url):
@@ -51,27 +51,33 @@ def cli():
     if os.path.exists(fn):
         os.remove(fn)
     db = dataset.connect('sqlite:///' + fn)
+
     db.engine.execute('CREATE TABLE startsida (kommun TEXT, UNIQUE(kommun))')
     db.engine.execute('''
 CREATE TABLE kaka (
   kommun TEXT NOT NULL,
   name TEXT NOT NULL,
-  value TEXT NOT NULL,
-  domain TEXT NOT NULL,
-  path TEXT NOT NULL,
-  httponly INTEGER NOT NULL,
-  secure INTEGER NOT NULL,
-  expires TEXT NOT NULL,
-  expiry TEXT NOT NULL,
+  value TEXT,
+  domain TEXT,
+  path TEXT,
+  httponly INTEGER,
+  secure INTEGER,
+  expires TEXT,
+  expiry TEXT,
 
   UNIQUE(kommun, name)
 )''')
 
-#   with ThreadPoolExecutor(8) as e:
-#       for kommun, startsida in startsidor():
-#           e.submit(gkebd, db, kommun, startsida)
-    for kommun, startsida in startsidor():
-        gkebd(db, kommun, startsida)
+    with ThreadPoolExecutor(8) as e:
+        for kommun, startsida in startsidor():
+            e.submit(gkebd, db, kommun, startsida)
+
+    sql = '''select kommun || ' (' || startsida || ')' as "x" from startsida where kommun not in (select kommun from kaka union select kommun from skript);'''
+    msg = 'Kommuner som använder varken skript eller kakor:\n%s\n'
+    sys.stdout.write(msg % '\n'.join(row['x'] for row in db.engine.execute(sql)))
+
+#   for kommun, startsida in startsidor():
+#       gkebd(db, kommun, startsida)
 
 def gkebd(db, kommun, startsida):
     db['startsida'].insert({'kommun': kommun, 'startsida': startsida})
