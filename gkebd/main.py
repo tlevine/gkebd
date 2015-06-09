@@ -86,8 +86,12 @@ CREATE TABLE kaka (
 #           e.submit(gkebd, db, kommun, startsida)
 
     sql = '''select kommun || ' (' || startsida || ')' as "x" from startsida where kommun not in (select kommun from kaka union select kommun from skript);'''
-    msg = 'Kommuner som använder varken skript eller kakor:\n%s\n'
-    sys.stdout.write(msg % '\n'.join(row['x'] for row in db.engine.execute(sql)))
+    kommuner = [row['x'] for row in db.engine.execute(sql)]
+    if len(kommuner) > 0:
+        msg = 'Kommuner som använder varken skript eller kakor:\n%s\n'
+        sys.stdout.write(msg % '\n'.join(kommuner))
+    else:
+        sys.stdout.write('Alla kommuner andvändar skript eller kakor!\n')
 
 #   for kommun, startsida in startsidor():
 #       gkebd(db, kommun, startsida)
