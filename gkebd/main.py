@@ -31,6 +31,13 @@ def startsidor():
                 if startsida:
                     yield future.result()
 
+def startsidor():
+    url = 'https://sv.wikipedia.org/wiki/Lista_%C3%B6ver_Sveriges_kommuner'
+    for k in parse.kommuner(get(url)):
+        kommun, startsida = hitta_startsida(k)
+        if startsida:
+            yield kommun, startsida
+
 def hitta_startsida(kommun):
     for url in parse.gissa_startsida(kommun):
         try:
@@ -41,7 +48,6 @@ def hitta_startsida(kommun):
             pass
         except:
             sys.stderr.write('Exception at %s\n' % url)
-            raise
         else:
             t = r.text.lower()
             if 'kommun' in t:

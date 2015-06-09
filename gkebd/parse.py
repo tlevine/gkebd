@@ -6,10 +6,12 @@ from unidecode import unidecode
 
 MANUAL = {
     'Falu kommun': 'http://www.falun.se',
+    'Hällefors kommun': None,
 }
 def gissa_startsida(kommun):
     if kommun in MANUAL:
-        yield MANUAL[kommun]
+        if MANUAL[kommun]:
+            yield MANUAL[kommun]
     else:
         m = re.match(r'^(.+[^s])(s?) kommun$', kommun)
         if not m:
