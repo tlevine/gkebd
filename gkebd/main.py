@@ -28,7 +28,7 @@ def startsidor():
                 yield startsida, response
 
 def hitta_startsida(kommun):
-    for url in parse.hemsida(kommun):
+    for url in parse.gissa_startsida(kommun):
         try:
             r = get(url, timeout = 10)
         except requests.exceptions.ConnectionError:

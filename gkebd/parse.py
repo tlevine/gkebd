@@ -4,11 +4,7 @@ from urllib.parse import urlparse
 from lxml.html import fromstring
 from unidecode import unidecode
 
-def hemsida(kommun):
-    '''
-    >>> hemsida('Vetlanda kommun')
-    'http://vetlanda.se'
-    '''
+def gissa_startsida(kommun):
     m = re.match(r'^(.+[^s])(s?) kommun$', kommun)
     if not m:
         assert False, kommun
@@ -32,7 +28,8 @@ def tracking(response):
     first_party = (o.scheme, o.netloc)
 
     for src in html.xpath('//script/@src'):
-        p = urlparse(src)
-        third_party = (p.scheme, p.netloc)
-        if third_party != first_party:
-            yield '%s://%s' % third_party
+        yield startsida(url)
+
+def startsida(url):
+    p = urlparse(src)
+    return '%s://%s' % (p.scheme, p.netloc)
