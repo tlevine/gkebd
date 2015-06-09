@@ -1,4 +1,8 @@
--- Hur många
+-- Varifrån kommer kakorna?
+select ltrim(replace(domain, 'www.', ''), '.') AS 'domain', count(*)
+from kaka group by 1 order by 2;
+
+-- Hur många skript och kakor?
 create view hur_många_skript as
 select kommun, count(*) as 'skript'
 from skript
@@ -23,7 +27,3 @@ select kommun, max(expires)
 from kaka
 group by kommun
 order by max(expires);
-
--- Varifrån kommer kakor?
-select ltrim(replace(domain, 'www.', ''), '.') AS 'domain', count(*)
-from kaka group by 1 order by 2;
