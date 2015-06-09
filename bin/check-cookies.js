@@ -13,7 +13,7 @@ var filename = system.args[1]
   , url = system.args[2]
 
 function f(status) {
-  fs.write(filename, JSON.stringify(phantom.cookies))
+  fs.write(filename, JSON.stringify(phantom.cookies) + '\n')
   phantom.exit()
 }
 
