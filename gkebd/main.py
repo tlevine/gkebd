@@ -36,7 +36,9 @@ def hitta_startsida(kommun):
         except requests.exceptions.ReadTimeout:
             pass
         else:
-            return kommun, url
+            t = r.text.lower()
+            if 'kommun' in t:
+                return kommun, url
     else:
         sys.stderr.write('Could not find a page for %s\n' % kommun)
         return None, None
