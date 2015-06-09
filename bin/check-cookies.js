@@ -18,7 +18,8 @@ page.open(url)
 setTimeout(function() {
   setTimeout(function() {          
     fs.write(filename, JSON.stringify(phantom.cookies) + '\n')
-    page.render(filename.replace('.json', '') + '.png')
+  //page.render(filename.replace('.json', '') + '.png')
+  //console.log(page.url)
     phantom.exit()
   }, 5000)
 }, 1)
