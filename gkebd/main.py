@@ -24,12 +24,12 @@ def check_cookies(url):
 def startsidor():
     url = 'https://sv.wikipedia.org/wiki/Lista_%C3%B6ver_Sveriges_kommuner'
     with ThreadPoolExecutor(20) as e:
-        futures = {e.submit(hitta_startsida, k): url for k in parse.kommuner(get(url))}
+        futures = {e.submit(hitta_startsida, k): k for k in parse.kommuner(get(url))}
         for future in as_completed(futures):
-            if future.exception():
-                sys.stderr.write('Exception at %s' % futures[future])
-            else:
-                yield future.result()
+            if not future.exception():
+                kommun, startsida = future.result()
+                if startsida:
+                    yield future.result()
 
 def hitta_startsida(kommun):
     for url in parse.gissa_startsida(kommun):
@@ -39,6 +39,9 @@ def hitta_startsida(kommun):
             pass
         except requests.exceptions.ReadTimeout:
             pass
+        except:
+            sys.stderr.write('Exception at %s\n' % url)
+            raise
         else:
             t = r.text.lower()
             if 'kommun' in t:
@@ -66,14 +69,15 @@ CREATE TABLE kaka (
   httponly INTEGER,
   secure INTEGER,
   expires TEXT,
-  expiry TEXT,
-
-  UNIQUE(kommun, name)
+  expiry TEXT
 )''')
 
-    with ThreadPoolExecutor(8) as e:
-        for kommun, startsida in startsidor():
-            e.submit(gkebd, db, kommun, startsida)
+    for kommun, startsida in startsidor():
+        gkebd(db, kommun, startsida)
+
+#   with ThreadPoolExecutor(8) as e:
+#       for kommun, startsida in startsidor():
+#           e.submit(gkebd, db, kommun, startsida)
 
     sql = '''select kommun || ' (' || startsida || ')' as "x" from startsida where kommun not in (select kommun from kaka union select kommun from skript);'''
     msg = 'Kommuner som använder varken skript eller kakor:\n%s\n'
