@@ -1,19 +1,18 @@
 #!/usr/bin/env phantomjs
+#
+# USAGE: check-cookies.js [output JSON file] [url]
+#
 
-var webpage = require('webpage')
-var system = require('system')
+var page = require('webpage').create()
+  , system = require('system')
+  , fs = require('fs')
 
-function checkPageCookies(filename, url) {
-  var page = webpage.create()
-  page.open(url, f)
-  function f(status) {
-    fs.write(filename, JSON.stringify(phantom.cookies))
-  }
+var filename = system.args[1]
+  , url = system.args[2]
+
+function f(status) {
+  fs.write(filename, JSON.stringify(phantom.cookies))
+  phantom.exit()
 }
 
-function main() {
-   var filename = system.args[1]
-     , url = system.args[2]
-
-  checkPageCookies(filename, url)
-}
+page.open(url, f)
