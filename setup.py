@@ -9,5 +9,6 @@ setup(name='gkebd',
       install_requires = [],
       version='0.0.3',
       license='AGPL',
+      scripts = [os.path.join('bin', 'check-cookies.js')],
       entry_points = {'console_scripts': ['gkebd = gkebd.main:cli']},
 )
