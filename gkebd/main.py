@@ -1,3 +1,4 @@
+import argparse
 import os, sys
 import subprocess, json, tempfile
 from collections import OrderedDict
@@ -56,13 +57,27 @@ def hitta_startsida(kommun):
         sys.stderr.write('Could not find a page for %s\n' % kommun)
         return None, None
 
+p = argparse.ArgumentParser(prog = 'gkebd',
+    description = 'Check for trackers and third-party data on websites.')
+p.add_argument('--input', '-i',
+               help = 'A CSV file as input, where each row has a name on the left and a url on the right (Swedish municipalities are used by default.)')
+p.add_argument('--output', '-o', default = '/tmp/gkebd.sqlite',
+               help = 'Where to save the resulting SQLite3 database')
+
 def cli():
     import dataset
 
-    fn = '/tmp/gkebd.sqlite'
-    if os.path.exists(fn):
-        os.remove(fn)
-    db = dataset.connect('sqlite:///' + fn)
+    args = p.parse_args()
+    if args.input == None:
+        sidor = startsidor
+    else:
+        fp = open(args.input, 'r')
+        sidor = csv.reader(fp)
+        next(sidor) # Skip the header.
+
+    if os.path.exists(args.output):
+        os.remove(args.output)
+    db = dataset.connect('sqlite:///' + args.output)
 
     db.engine.execute('CREATE TABLE startsida (kommun TEXT, UNIQUE(kommun))')
     db.engine.execute('''
@@ -86,7 +101,7 @@ CREATE TABLE kaka (
   FOREIGN KEY (kommun) REFERENCES startsida(kommun)
 )''')
 
-    for kommun, startsida in startsidor():
+    for kommun, startsida in sidor():
         gkebd(db, kommun, startsida)
 
 #   with ThreadPoolExecutor(8) as e:
