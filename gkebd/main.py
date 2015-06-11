@@ -1,4 +1,4 @@
-import argparse
+import argparse, csv
 import os, sys
 import subprocess, json, tempfile
 from collections import OrderedDict
@@ -69,7 +69,7 @@ def cli():
 
     args = p.parse_args()
     if args.input == None:
-        sidor = startsidor
+        sidor = startsidor()
     else:
         fp = open(args.input, 'r')
         sidor = csv.reader(fp)
@@ -101,7 +101,7 @@ CREATE TABLE kaka (
   FOREIGN KEY (kommun) REFERENCES startsida(kommun)
 )''')
 
-    for kommun, startsida in sidor():
+    for kommun, startsida in sidor:
         gkebd(db, kommun, startsida)
 
 #   with ThreadPoolExecutor(8) as e:
