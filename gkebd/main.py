@@ -71,8 +71,7 @@ def cli():
     if args.input == None:
         sidor = startsidor()
     else:
-        fp = open(args.input, 'r')
-        sidor = csv.reader(fp)
+        sidor = csv.reader(open(args.input, 'r'))
         next(sidor) # Skip the header.
 
     if os.path.exists(args.output):
@@ -122,8 +121,11 @@ CREATE TABLE kaka (
     # Freezefiles
     base_fn = args.output.replace('.sqlite', '')
     for table in db.tables:
-        dataset.freeze(db[table].all(), filename = '%s-%s.csv' % (base_fn, table),
-                       format = 'csv')
+        fn = '%s-%s.csv' % (base_fn, table)
+
+        # Hack because absolute paths are not allowed for dataset.freeze
+        with open(fn, 'w') as fp:
+            dataset.freeze(db[table].all(), fileobj = fp, format = 'csv', mode = 'list')
 
 def gkebd(db, kommun, startsida):
     db['startsida'].insert({'kommun': kommun, 'startsida': startsida})
