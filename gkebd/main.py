@@ -5,6 +5,7 @@ from collections import OrderedDict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from vlermv import cache
+from vlermv.serializers import identity_bytes
 import requests
 
 from . import parse

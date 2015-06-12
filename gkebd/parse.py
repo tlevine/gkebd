@@ -41,3 +41,6 @@ def tracking(response):
 def startsida(url):
     p = urlparse(url)
     return '%s://%s' % (p.scheme, p.netloc)
+
+def https(communicate):
+    stdout, stderr = communicate
