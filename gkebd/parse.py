@@ -1,3 +1,4 @@
+import functools
 import re
 from urllib.parse import urlparse
 
@@ -44,3 +45,15 @@ def startsida(url):
 
 def https(communicate):
     stdout, stderr = communicate
+    info = [line.strip() for line in stdout.decode('utf-8').split('---')]
+    certificate = info[6]
+    
+    def f(chain, line):
+        if line[1] != ' ':
+            chain.append('')
+        else:
+            chain[-1] += ''
+        chain[-1] += line[3:]
+        return chain
+
+    return functools.reduce(f, info[1].split('\n')[1:], [])
